@@ -1,7 +1,7 @@
-const OpenAi=require("openai");
+const Groq = require("groq-sdk");
 
-const openai=OpenAi({
-    apikey:process.env.OPENAI_API_KEY,
-})
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
+});
 
-module.exports=openai;
+module.exports = groq;

@@ -1,6 +1,6 @@
 require("dotenv").config();
 const express=require("express");
-const openai=require("./llm/client");
+const groq=require("./llm/client");
 const redis=require("./memory/redisClient");
 
 const app=express();
@@ -21,10 +21,10 @@ app.post("/ask",async (req,res)=>{
         const messages=history?JSON.parse(history):[]; //what does json.parse do ?
         messages.push({role:"user",content:question});
 
-        const response=await openai.chat.completions.create({
-            model:"gpt-4o-mini",
+        const response=await groq.chat.completions.create({
+            model:"llama-3.1-8b-instant",
             //why are we sending full message array why not only question how will this 
-            // openai model will know what is the actual question if we send the whole msg array 
+            // groq model will know what is the actual question if we send the whole msg array 
             messages,
         })
 
