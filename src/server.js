@@ -2,9 +2,30 @@ require("dotenv").config();
 const express=require("express");
 const groq=require("./llm/client");
 const redis=require("./memory/redisClient");
+const morgan=require("morgan");
+const ratelimiter=require("express-rate-limit");
+
+//explain me this in detail how this is working internally 
+const limiter=ratelimiter({
+    windowMs:1*60*1000,
+    max:20,
+    message:"too many req, plese try again later"
+})
 
 const app=express();
+app.use(limiter);
 app.use(express.json());
+//what does this morgan do and what is dev inside it 
+app.use(morgan("dev"));
+
+app.get("/health",(req,res)=>{
+    res.json({
+        status:"ok",
+        service:"ai-copilot",
+        timeStamp:new Date()
+    })
+})
+
 
 app.post("/ask",async (req,res)=>{
     const {userId,question}=req.body || {};
@@ -33,7 +54,7 @@ app.post("/ask",async (req,res)=>{
 
         messages.push({role:"assistant",content:answer});
 
-        await redis.set(userId,JSON.stringify(messages));
+        await redis.set(userId,JSON.stringify(messages),"EX",3600);
         res.json({answer});
     } catch (error) {
         console.error(error);
@@ -43,4 +64,14 @@ app.post("/ask",async (req,res)=>{
 
 app.listen(3000,()=>{
     console.log("server running....");
+})
+
+//what is this global error handler how is this working 
+//and how is this important
+
+app.use((err,req,res,next)=>{
+    console.error(err),
+    res.staus(500).json({
+        err:"intenal server error"
+    })
 })
