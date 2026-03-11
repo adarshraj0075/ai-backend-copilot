@@ -71,7 +71,7 @@ app.listen(3000,()=>{
 
 app.use((err,req,res,next)=>{
     console.error(err),
-    res.staus(500).json({
+    res.status(500).json({
         err:"intenal server error"
     })
 })
