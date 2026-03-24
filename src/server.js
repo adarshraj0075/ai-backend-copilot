@@ -6,6 +6,7 @@ const limiter = require("./middleware/rateLimiter");
 const errorHandler = require("./middleware/errorHandler");
 
 const aiRoutes = require("./routes/ai.routes");
+const githubRoutes=require("./routes/github.routes")
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(logger);
 app.use(limiter);
 
 app.use("/api", aiRoutes);
+app.use("/api/github")
 
 app.use(errorHandler);
 
