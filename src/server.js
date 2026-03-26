@@ -15,7 +15,7 @@ app.use(logger);
 app.use(limiter);
 
 app.use("/api", aiRoutes);
-app.use("/api/github")
+app.use("/api/github",githubRoutes)
 
 app.use(errorHandler);
 
