@@ -1,20 +1,30 @@
 const {getAiResponse}=require("./ai.service");
 const {getRepofiles,getFileContent}=require('./github.service');
+const {fakeEmbedding}=require("./embedding.service");
+const {searchVectorStore,addToVectorStore}=require('./vector.service');
 
-async function answerFromRepo(owner,repo,question) {
+async function indexRepo(owner,repo) {
     const files=await getRepofiles(owner,repo);
-
-    let context="";
-
-    // why are we running for of loop on files 
     for(let file of files){
         if(file.type==="file"){
-            //what is this content and what is file.download_url doing 
             const content=await getFileContent(file.download_url);
-            //why is this \n and why are we using 
-            context+=`\n\nile: ${file.name}\n${content}`
+
+            const chunks=content.match(/.{1,500}/g) || [];
+
+            for(let chunk of chunks){
+                const embedding=fakeEmbedding(chunk);
+                addToVectorStore(chunk,embedding);
+            }
         }
     }
+}
+
+async function answerFromRepo(owner,repo,question) {
+    
+    await indexRepo(owner,repo);
+    const queryEmbedding=fakeEmbedding(question);
+    const result=searchVectorStore(queryEmbedding)
+    const context=result.map(r=>r.text).join("\n");
 
     const message=[
         // why hear is two role and two content 
