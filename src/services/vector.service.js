@@ -5,7 +5,7 @@ function addToVectorStore(text,embedding){
     vectorStore.push({text,embedding});
 }
 
-function searchVectorStore(queryEmbedding,topK=3){
+function searchVectorStore(queryEmbedding,topK=1){
     return vectorStore.map(item=>({
         ...item,
         score:similarity(queryEmbedding,item.embedding),//what does similatity will return is it boolean value or what ?

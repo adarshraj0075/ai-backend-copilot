@@ -9,7 +9,7 @@ async function indexRepo(owner,repo) {
         if(file.type==="file"){
             const content=await getFileContent(file.download_url);
 
-            const chunks=content.match(/.{1,500}/g) || [];
+            const chunks=content.match(/.{1,200}/g) || [];
 
             for(let chunk of chunks){
                 const embedding=fakeEmbedding(chunk);
@@ -24,7 +24,11 @@ async function answerFromRepo(owner,repo,question) {
     await indexRepo(owner,repo);
     const queryEmbedding=fakeEmbedding(question);
     const result=searchVectorStore(queryEmbedding)
-    const context=result.map(r=>r.text).join("\n");
+    let context="";
+    for(let r of result){
+        if(context.length+r.text.length>2000) break;
+        context+=r.text+ "\n";
+    }
 
     const message=[
         // why hear is two role and two content 
