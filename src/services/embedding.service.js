@@ -20,4 +20,4 @@ async function getEmbedding(text){
     return content.split("").map(c=>c.charCodeAt(0)/255);
 }
 
-module.exports={fakeEmbedding};
+module.exports={getEmbedding};
